@@ -23,4 +23,11 @@ public class MainActivity extends Activity
       WakeomaticEnabler.getInstance().alarmOff();
    }
 
+   @Override
+   protected void onPause()
+   {
+      super.onPause();
+
+      finish();
+   }
 }

@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.telephony.SmsMessage;
+import android.util.Log;
 
 /**
  * Boradcast receiver registered to be called when an SMS comes in.
@@ -16,18 +17,23 @@ import android.telephony.SmsMessage;
  */
 public class SmsBroadcastReceiver extends BroadcastReceiver
 {
+   private static final String TAG = "SmsBroadcastReceiver";
+
    private static final String SMS_INTENT_ACTION = "android.provider.Telephony.SMS_RECEIVED";
 
-   private static final String TRIGGER_MESSAGE = "boom";
+   private static final String TRIGGER_MESSAGE = "Boom";
 
    private static final int NOTIF_ID = 8181;
 
    @Override
    public void onReceive(Context context, Intent intent)
    {
+      Log.v(TAG, "Received an SMS...");
+
       if(SMS_INTENT_ACTION.equals(intent.getAction()) &&
             isTriggerMessage(intent))
       {
+         Log.v(TAG, "Things just got real...");
          WakeomaticEnabler.getInstance().alarmOn(context);
          makeNotification(context);
       }
@@ -60,7 +66,7 @@ public class SmsBroadcastReceiver extends BroadcastReceiver
    {
       Intent mainActivityIntent = new Intent(context, MainActivity.class);
       PendingIntent launchAppIntent = PendingIntent.getActivity(
-            context, 1, mainActivityIntent,  Intent.FLAG_ACTIVITY_NEW_TASK);
+            context, 1, mainActivityIntent,  Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
 
       Notification.Builder builder = new Notification.Builder(context);
       builder.setSmallIcon(R.drawable.ic_launcher)
@@ -68,6 +74,7 @@ public class SmsBroadcastReceiver extends BroadcastReceiver
             .setContentText("You gone dun did it now...")
             .setContentIntent(launchAppIntent);
       Notification notification = builder.build();
+      notification.flags |= Notification.FLAG_ONLY_ALERT_ONCE | Notification.FLAG_AUTO_CANCEL;
       NotificationManager notificationManager =
             (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
       notificationManager.notify(NOTIF_ID, notification);
