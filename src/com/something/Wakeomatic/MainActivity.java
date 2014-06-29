@@ -14,4 +14,13 @@ public class MainActivity extends Activity
       super.onCreate(savedInstanceState);
       setContentView(R.layout.main);
    }
+
+   @Override
+   protected void onResume()
+   {
+      super.onResume();
+
+      WakeomaticEnabler.getInstance().alarmOff();
+   }
+
 }
